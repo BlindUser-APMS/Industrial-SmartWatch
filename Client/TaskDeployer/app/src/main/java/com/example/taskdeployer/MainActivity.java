@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.wear.widget.BoxInsetLayout;
@@ -34,11 +35,11 @@ import static android.provider.CalendarContract.EXTRA_EVENT_ID;
 
 public class MainActivity extends WearableActivity {
 
-    private class Task{
-        private String taskId;
-        private String taskUrgency;
-        private String taskOrigin;
-        private String taskDescription;
+    private static class Task{
+        private final String taskId;
+        private final String taskUrgency;
+        private final String taskOrigin;
+        private final String taskDescription;
 
         public Task(String origin, String description, String urgency, String id){
             taskId = id;
@@ -62,14 +63,14 @@ public class MainActivity extends WearableActivity {
         public String get_description(){
             return taskDescription;
         }
-    };
+    }
     private boolean task_in_progress = false, app_active = true, sending_message = false;
-    private String ip_address = "192.168.137.1", id_task_in_progress="";
-    private int port = 50000, current_task = 0;
+    private final String ip_address = "10.96.4.74";
+    private String id_task_in_progress="";
+    private int current_task = 0;
     private TextView task_origin_text, task_description_text, count_text;
     private Button action_button, next_button, prev_button;
     private BoxInsetLayout main_layout;
-    private String android_id;
     private int communication_port = 0;
     private String message_to_send = "Status=NEUTRAL\n";
     private String [] task_info = new String[4];
@@ -90,14 +91,12 @@ public class MainActivity extends WearableActivity {
                 ds.setSoTimeout(4000);
                 task_description_text.post(new Runnable() {
                     public void run() {
-                        task_description_text.setText("No tasks in queue");
+                        task_description_text.setText(R.string.NOTASK);
                     }
                 });
-                byte buf[] = null;
-                byte buf2[] = new byte[128];
-                while (true) {
-                    if (!app_active)
-                        break;
+                byte[] buf;
+                byte[] buf2 = new byte[128];
+                while (app_active) {
                     buf = message_to_send.getBytes();
                     DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip, communication_port);
                     ds.send(DpSend);
@@ -142,7 +141,7 @@ public class MainActivity extends WearableActivity {
                                     }
                                 });
                             } else {
-                                final String text_for_count = String.valueOf(task_list.size()) + "/" + String.valueOf(task_list.size());
+                                final String text_for_count = task_list.size() + "/" + task_list.size();
 
                                 prev_button.post(new Runnable() {
                                     public void run() {
@@ -186,11 +185,11 @@ public class MainActivity extends WearableActivity {
                 Log.i("Communication", "Creating datagram socket");
                 DatagramSocket ds = new DatagramSocket();
                 InetAddress ip = InetAddress.getByName(ip_address);
-                byte buf[] = null;
+                byte[] buf;
                 String toSend = "Device_ID=SmartWatch2\n";
                 buf = toSend.getBytes();
                 Log.i("Communication", "Sending communication request to server");
-                DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip, 50000);
+                DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip,50000);
                 ds.send(DpSend);
                 Log.i("Communication", "Waiting for port assignment");
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -209,6 +208,7 @@ public class MainActivity extends WearableActivity {
     };
 
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -236,12 +236,11 @@ public class MainActivity extends WearableActivity {
         main_layout = (BoxInsetLayout) findViewById(R.id.box_layout);
         mp = MediaPlayer.create(this, R.raw.ding);
 
-        int notificationId = 001;
 // The channel ID of the notification.
         String id = "my_channel_01";
 // Build intent for notification content
         Intent viewIntent = new Intent(this, MainActivity.class);
-        viewIntent.putExtra(EXTRA_EVENT_ID, 001);
+        viewIntent.putExtra(EXTRA_EVENT_ID, 1);
         PendingIntent viewPendingIntent =
                 PendingIntent.getActivity(this, 0, viewIntent, 0);
 
@@ -257,19 +256,14 @@ public class MainActivity extends WearableActivity {
 
 
         notificationManager = NotificationManagerCompat.from(this);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            String channelId = "Your_channel_id";
-            NotificationChannel channel = new NotificationChannel(
-                    channelId,
-                    "Channel human readable title",
-                    NotificationManager.IMPORTANCE_HIGH);
-            notificationManager.createNotificationChannel(channel);
-            notificationBuilder.setChannelId(channelId);
-        }
-//        android_id = UUID.randomUUID().toString();
+        String channelId = "Your_channel_id";
+        NotificationChannel channel = new NotificationChannel(
+                channelId,
+                "Channel human readable title",
+                NotificationManager.IMPORTANCE_HIGH);
+        notificationManager.createNotificationChannel(channel);
+        notificationBuilder.setChannelId(channelId);
 
-        Log.i("Communication", "The ID is: " + android_id);
 
         // Enables Always-on
         setAmbientEnabled();
@@ -298,7 +292,7 @@ public class MainActivity extends WearableActivity {
         for (int i=0; i<task_list.size(); i++){
             if (task_list.get(i).get_id().equals(task_id)){
                 task_list.remove(i);
-                final String text_for_count = "1/" + String.valueOf(task_list.size());
+                final String text_for_count = "1/" + task_list.size();
 
                 if (task_list.size()>1){
                     if (!task_in_progress)
@@ -347,7 +341,7 @@ public class MainActivity extends WearableActivity {
                                 next_button.setVisibility(View.INVISIBLE);
                                 prev_button.setVisibility(View.INVISIBLE);
                                 count_text.setVisibility(View.INVISIBLE);
-                                task_description_text.setText("No task in queue");
+                                task_description_text.setText(R.string.NOTASK);
                                 main_layout.setBackgroundColor(Color.parseColor("#80575757"));
                             }
                         });
@@ -366,7 +360,7 @@ public class MainActivity extends WearableActivity {
             task_in_progress = false;
             message_to_send = "COMPLETED:" + id_task_in_progress + "\n";
             sending_message = true;
-            action_button.setText("ACQUIRE TASK");
+            action_button.setText(R.string.ACQUIRE);
             remove_task(id_task_in_progress);
             if (task_list.size()>1)
             id_task_in_progress = "";
@@ -381,7 +375,7 @@ public class MainActivity extends WearableActivity {
             prev_button.setVisibility(View.INVISIBLE);
             count_text.setVisibility(View.INVISIBLE);
             main_layout.setBackgroundColor(Color.parseColor("#803F51B5"));
-            action_button.setText("TASK COMPLETED");
+            action_button.setText(R.string.COMPLETE);
         }
 
 
@@ -395,7 +389,7 @@ public class MainActivity extends WearableActivity {
         }
         task_origin_text.setText(task_list.get(current_task-1).get_origin());
         task_description_text.setText(task_list.get(current_task-1).get_description());
-        String text_to_display = String.valueOf(current_task) + "/" + String.valueOf(task_list.size());
+        String text_to_display = current_task + "/" + task_list.size();
         count_text.setText(text_to_display);
         if (task_list.get(current_task-1).get_urgency().contains("URGENT")){
             main_layout.setBackgroundColor(Color.parseColor("#80F44336"));
@@ -414,7 +408,7 @@ public class MainActivity extends WearableActivity {
 
         task_origin_text.setText(task_list.get(current_task-1).get_origin());
         task_description_text.setText(task_list.get(current_task-1).get_description());
-        String text_to_display = String.valueOf(current_task) + "/" + String.valueOf(task_list.size());
+        String text_to_display = current_task + "/" + task_list.size();
         count_text.setText(text_to_display);
         main_layout.setBackgroundColor(Color.parseColor("#80F44336"));
         if (task_list.get(current_task-1).get_urgency().contains("URGENT")){

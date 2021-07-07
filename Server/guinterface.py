@@ -2,7 +2,7 @@
 from random import randint
 import tkinter as tk
 import threading
-import serv
+import smartwatch_server
 import time
 from threading import Lock
 
@@ -48,7 +48,7 @@ listbox2 = def_listbox()
 
 
 
-p = serv.SmartWatchServer()
+p = smartwatch_server.SmartWatchServer()
 listbox1.bind("<MouseWheel>", lambda event: scrolllistbox(event, listbox2))
 listbox2.bind("<MouseWheel>", lambda event: scrolllistbox(event, listbox1))
 # ================== SWITCH BUTTON =========================
