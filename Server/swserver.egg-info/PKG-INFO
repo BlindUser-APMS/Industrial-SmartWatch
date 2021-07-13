@@ -1,0 +1,15 @@
+Metadata-Version: 1.1
+Name: swserver
+Version: 0.1
+Summary: Server for smart watch task deployment
+Home-page: UNKNOWN
+Author: Ioan-Matei Sarivan
+Author-email: ioanms@mp.aau.dk
+License: UNKNOWN
+Description: Server for smart watch task deployment
+Keywords: swserver
+Platform: UNKNOWN
+Classifier: Development Status :: Experimental
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3.8

@@ -160,15 +160,38 @@ class SmartWatchServer():
         x = Thread(target=self.communication)
         x.start()
 
-        
+    def _task_exists(self, origin, description, urgency):
+        same_origin = False
+        same_description = False
+        same_urgency = False
+        for task in self.tasks:
+            if origin in task.get_origin():
+                same_origin = True
+            if description in task.get_description():
+                same_description = True
+            if urgency in task.get_urgency():
+                same_urgency = True
+            
+            if same_urgency and same_origin and same_description:
+                return True
+        else:
+            return False
 
     def new_task(self, origin, description, urgency):
-        task = Task(origin, description, urgency)
-        self.tasks.append(task)
-        for device in self.devices:
-            device.new_task(task)
-            time.sleep(0.1)
-        return task.get_id()
+        if not self._task_exists(origin, description, urgency):
+            task = Task(origin, description, urgency)
+            self.tasks.append(task)
+            for device in self.devices:
+                device.new_task(task)
+                time.sleep(0.1)
+            print("\n\nCreated task: ", task.get_id())
+            print("Origin: ", task.get_origin())
+            print("Description: ", task.get_description())
+            print("Urgency: ", task.get_urgency(), "\n\n")
+            return task.get_id()
+        else:
+            print("Tasks exists")
+            return None
 
     def get_tasks(self):
         return self.tasks

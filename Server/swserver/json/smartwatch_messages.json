@@ -1,0 +1,19 @@
+{
+    "event_messages": [
+        {
+            "stationName": "CMStation1",
+            "triggerState": "STATE_STOPPED",
+            "msg_taskOrigin": "Sorting Station 1",
+            "msg_taskDescription": "Station has stopped",
+            "msg_taskPriority": "Normal"
+        },
+
+        {
+            "stationName": "CMStation2",
+            "triggerState": "STATE_STOPPED",
+            "msg_taskOrigin": "Sorting Station 2",
+            "msg_taskDescription": "Station has stopped",
+            "msg_taskPriority": "Normal"
+        }
+    ]
+}

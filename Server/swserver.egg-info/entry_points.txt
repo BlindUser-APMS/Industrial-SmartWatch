@@ -1,0 +1,3 @@
+[console_scripts]
+swserver = swserver.__init__:main
+

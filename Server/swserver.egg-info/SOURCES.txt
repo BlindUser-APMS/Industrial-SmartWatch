@@ -1,0 +1,12 @@
+setup.py
+swserver/__init__.py
+swserver/guinterface.py
+swserver/mqtt_client.py
+swserver/smartwatch_server.py
+swserver.egg-info/PKG-INFO
+swserver.egg-info/SOURCES.txt
+swserver.egg-info/dependency_links.txt
+swserver.egg-info/entry_points.txt
+swserver.egg-info/not-zip-safe
+swserver.egg-info/requires.txt
+swserver.egg-info/top_level.txt

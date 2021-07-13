@@ -65,7 +65,7 @@ public class MainActivity extends WearableActivity {
         }
     }
     private boolean task_in_progress = false, app_active = true, sending_message = false;
-    private final String ip_address = "10.96.4.74";
+    private final String ip_address = "172.20.0.104";
     private String id_task_in_progress="";
     private int current_task = 0;
     private TextView task_origin_text, task_description_text, count_text;
